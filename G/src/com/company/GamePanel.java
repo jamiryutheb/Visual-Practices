@@ -16,11 +16,13 @@ public class GamePanel extends JPanel implements Runnable {
     static int body = 4;
     int[] x = new int[FRAME_WIDTH];
     int[] y = new int[FRAME_HEIGHT];
-
+//    int millis = 200;
+    int appleCount = 0;
+    int decrease = 60;
 
     public GamePanel(){
 
-        this.setPreferredSize(new Dimension(800,600));
+        this.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_HEIGHT));
         this.setFocusable(true);
         addKeyListener(new PLAY());
         new Thread(this).start();
@@ -38,6 +40,7 @@ public class GamePanel extends JPanel implements Runnable {
         while (running){
             move();
             eatCheck();
+            crashCheck();
             repaint();
             try {
                 Thread.sleep(millis);
@@ -45,6 +48,21 @@ public class GamePanel extends JPanel implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void crashCheck() {
+        int head_X = x[0];
+        int head_Y = y[0];
+
+        // TODO : Call a game over function
+        for(int i = 1; i < body; i++){
+            if (head_X == x[i] && head_Y == y[i]) {
+                running = false;
+                break;
+            }
+        }
+
+
     }
 
     @Override
@@ -58,6 +76,14 @@ public class GamePanel extends JPanel implements Runnable {
         for (int i = body; i > 0; i--) {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
+            if(x[0] > FRAME_WIDTH)
+                x[0] = 0;
+            else if (x[0] < 0)
+                x[0] = FRAME_WIDTH;
+            if(y[0] > FRAME_HEIGHT)
+                y[0] = 0;
+            else if (y[0] < 0)
+                y[0] = FRAME_HEIGHT;
         }
 
         if(direction == 'R')
@@ -78,11 +104,21 @@ public class GamePanel extends JPanel implements Runnable {
 
     private void grow() {
         body++;
+//        speedUp();
+
+    }
+
+    public void speedUp() {
+        if(appleCount > 5 && decrease > 0) {
+            millis -= decrease;
+            decrease -=4;
+        }
     }
 
     private void apple() {
         applePosX = (int) (Math.random() * FRAME_WIDTH/_UNIT) * _UNIT;
         applePosY = (int) (Math.random() * FRAME_HEIGHT/_UNIT) * _UNIT;
+        appleCount++;
     }
 
     public void draw(Graphics g){
@@ -90,9 +126,13 @@ public class GamePanel extends JPanel implements Runnable {
         g.setColor(Color.red);
         g.fillOval(applePosX, applePosY, _UNIT, _UNIT);
 
-        g.setColor(Color.CYAN);
-        for(int i = 0; i < body; i++)
+        for(int i = 0; i < body; i++) {
+            if (i == 0)
+                g.setColor(Color.red);
+            else
+                g.setColor(Color.BLACK);
                 g.fillRect(x[i], y[i], _UNIT, _UNIT);
+        }
 
     }
 
