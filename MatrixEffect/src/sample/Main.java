@@ -9,15 +9,23 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class Main extends Application {
-    int width = 1440;
-    int height = 900;
-    Char[] chars;
+    static final int width = 1440;
+    static final int height = 900;
+
+    static List<String> list = new ArrayList<>() ;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+
+        loadList();
 
         primaryStage.setTitle("Matrix");
         Group root = new Group();
@@ -25,21 +33,17 @@ public class Main extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
 
-        chars = new Char[500];
-        CharList.shuffle();
-        Arrays.setAll(chars, i -> new Char((int) (Math.random() * width), (int) (Math.random() * -300)));
-
+        CharList[] chArr = IntStream.range(0, 70).mapToObj(i -> new CharList()).toArray(CharList[]::new);
 
         new AnimationTimer() {
             public void handle(long now) {
 
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, width , height);
+                IntStream.range(0, chArr.length).forEach(i -> {
+                    chArr[i].render(gc);
+                });
 
-                for (Char aChar : chars) {
-                    aChar.draw(gc);
-                    aChar.rain();
-                }
             }
 
         }.start();
@@ -53,5 +57,13 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+
+    public static void loadList() throws FileNotFoundException {
+        Scanner s = new Scanner(new File("C:\\Users\\EnesGuven\\IdeaProjects\\MatrixEffect\\src\\sample\\character.txt"));
+        list = new ArrayList<>();
+        while (s.hasNext()) list.add(s.next());
+        s.close();
     }
 }

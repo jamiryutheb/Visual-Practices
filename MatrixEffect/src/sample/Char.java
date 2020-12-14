@@ -1,36 +1,38 @@
 package sample;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
+import javafx.scene.effect.MotionBlur;
+import javafx.scene.text.Text;
+
 
 public class Char{
 
     int x;
     int y;
-    int speed;
     int index;
-    int distance;
-    int thickness;
+    int size;
+    String text;
+
 
     public Char(int x, int y)  {
-        this.index = (int) (Math.random() * CharList.list.size());
+        this.size = Main.list.size();
+        this.index = (int) (Math.random() * size);
+        this.text = Main.list.get(index);
         this.x = x;
         this.y = y;
-        this.distance = (int)(Math.random() * 10);
-        this.speed = (int)(Math.random() * distance + 2) + 2;
-        this.thickness = (int)(Math.random() * (distance + 40));
     }
 
-    public void rain() {
-        y = (y > 900) ?  0 : (y +=speed);
+    public void rain(int speed) {
+            y = (y > 900) ?  0 : (y += speed);
     }
 
-    public void draw(GraphicsContext gc) {
-        gc.setFont(new Font("", thickness));
-        gc.setFill(Color.rgb(0,200,70));
-        gc.fillText(CharList.list.get(index) , x, y);
-        if(y % 10 == 0)
-            index = (int) (Math.random() * CharList.list.size());
+    public void render(GraphicsContext g2) {
+        g2.fillText(text, x, y);
+    }
+
+
+    public void reset() {
+        this.index = (int) (Math.random() * size);
+        this.text = Main.list.get(index);
     }
 }
